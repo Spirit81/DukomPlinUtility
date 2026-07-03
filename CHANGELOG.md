@@ -23,3 +23,10 @@
 ### Fixed
 - Prevent duplicate file entries in Zgrade file list.
 - Keep settings save errors from closing the app.
+
+## v1.0.2 - Module Views Refactor
+
+### Changed
+- Split module UI into separate WPF UserControls under `Views/`.
+- `MainWindow.xaml` is now mostly shell/navigation layout.
+- Existing functionality is kept through view events and service calls.
