@@ -3,8 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using DukomPlinUtility.Helpers;
 using DukomPlinUtility.Models;
 using DukomPlinUtility.Services;
 
@@ -22,8 +20,10 @@ public partial class MainWindow : Window
         _settings = SettingsService.Load();
         WindowSettingsService.Apply(this, _settings);
 
+        WireViewEvents();
         LoadSettingsToUi();
-        ListZgradeFiles.ItemsSource = _zgradeFiles;
+
+        ViewZgrade.FilesSource = _zgradeFiles;
 
         UpdateSourceViews();
         ShowView(AppModuleExtensions.FromString(_settings.LastModule));
@@ -31,12 +31,39 @@ public partial class MainWindow : Window
         Closing += (_, _) => SaveSettingsFromUi();
     }
 
+    private void WireViewEvents()
+    {
+        ViewDashboard.WalkByRequested += (_, _) => ShowView(AppModule.WalkBy);
+        ViewDashboard.NbIotRequested += (_, _) => ShowView(AppModule.NbIot);
+        ViewDashboard.ZgradeRequested += (_, _) => ShowView(AppModule.Zgrade);
+
+        ViewWalkBy.BrowseXmlRequested += (_, _) => BrowseXml();
+        ViewWalkBy.BrowseOutputRequested += (_, _) => BrowseOutput();
+        ViewWalkBy.OpenSettingsRequested += (_, _) => ShowView(AppModule.Settings);
+        ViewWalkBy.RunRequested += (_, _) => RunWalkBy();
+        ViewWalkBy.OpenOutputRequested += (_, _) => OpenOutputFolder();
+
+        ViewNbIot.BrowseNbIotRequested += (_, _) => BrowseNbIot();
+        ViewNbIot.RunRequested += (_, _) => RunNbIot();
+        ViewNbIot.OpenOutputRequested += (_, _) => OpenOutputFolder();
+
+        ViewZgrade.BrowseFilesRequested += (_, _) => BrowseZgrade();
+        ViewZgrade.ClearRequested += (_, _) => _zgradeFiles.Clear();
+        ViewZgrade.RunRequested += (_, _) => RunZgrade();
+        ViewZgrade.FileDropped += (_, file) => AddZgradeFile(file);
+
+        ViewLogs.OpenLogRequested += (_, _) => OpenLog();
+
+        ViewSettings.BrowseSourceRequested += (_, _) => BrowseSource();
+        ViewSettings.SaveRequested += (_, _) => SaveSettings();
+    }
+
     private void LoadSettingsToUi()
     {
-        TxtSharedSource.Text = _settings.SharedSourceFile;
-        TxtOutput.Text = _settings.LastOutputFolder;
-        TxtNbOutput.Text = _settings.LastOutputFolder;
-        DpExpectedDate.SelectedDate = DateTime.Today;
+        ViewSettings.SharedSourceFile = _settings.SharedSourceFile;
+        ViewWalkBy.OutputFolder = _settings.LastOutputFolder;
+        ViewNbIot.OutputFolder = _settings.LastOutputFolder;
+        ViewNbIot.ExpectedDate = DateTime.Today;
     }
 
     private void SaveSettingsFromUi()
@@ -44,8 +71,8 @@ public partial class MainWindow : Window
         try
         {
             WindowSettingsService.Capture(this, _settings);
-            _settings.SharedSourceFile = TxtSharedSource.Text.Trim();
-            _settings.LastOutputFolder = FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text, _settings.LastOutputFolder);
+            _settings.SharedSourceFile = ViewSettings.SharedSourceFile.Trim();
+            _settings.LastOutputFolder = FirstNonEmpty(ViewWalkBy.OutputFolder, ViewNbIot.OutputFolder, _settings.LastOutputFolder);
             SettingsService.Save(_settings);
         }
         catch
@@ -66,11 +93,6 @@ public partial class MainWindow : Window
             ShowView(AppModuleExtensions.FromString(tag));
         }
     }
-
-    private void OpenWalkByCard(object sender, MouseButtonEventArgs e) => ShowView(AppModule.WalkBy);
-    private void OpenNbIotCard(object sender, MouseButtonEventArgs e) => ShowView(AppModule.NbIot);
-    private void OpenZgradeCard(object sender, MouseButtonEventArgs e) => ShowView(AppModule.Zgrade);
-    private void OpenSettings_Click(object sender, RoutedEventArgs e) => ShowView(AppModule.Settings);
 
     private void ShowView(AppModule module)
     {
@@ -108,7 +130,7 @@ public partial class MainWindow : Window
 
     private void HideAllViews()
     {
-        foreach (var view in new[]
+        foreach (var view in new FrameworkElement[]
                  {
                      ViewDashboard,
                      ViewWalkBy,
@@ -125,107 +147,63 @@ public partial class MainWindow : Window
 
     private void UpdateSourceViews()
     {
-        var source = string.IsNullOrWhiteSpace(TxtSharedSource.Text)
+        var source = string.IsNullOrWhiteSpace(ViewSettings.SharedSourceFile)
             ? "Source nije postavljen"
-            : TxtSharedSource.Text;
+            : ViewSettings.SharedSourceFile;
 
-        LblDashboardSource.Text = source;
-        TxtWalkBySourceView.Text = source;
-    }
-
-    #endregion
-
-    #region Drag and drop
-
-    private void File_DragOver(object sender, DragEventArgs e) => DragDropHelper.SetFileDropEffect(e);
-
-    private void Xml_Drop(object sender, DragEventArgs e)
-    {
-        var file = DragDropHelper.FirstFileByExtension(e, ".xml");
-        if (file is not null)
-        {
-            TxtXml.Text = file;
-        }
-    }
-
-    private void NbIot_Drop(object sender, DragEventArgs e)
-    {
-        var file = DragDropHelper.FirstFile(e);
-        if (file is not null)
-        {
-            TxtNbIot.Text = file;
-        }
-    }
-
-    private void Output_Drop(object sender, DragEventArgs e)
-    {
-        var folder = DragDropHelper.DroppedDirectoryOrParent(e);
-        if (folder is not null)
-        {
-            TxtOutput.Text = folder;
-            TxtNbOutput.Text = folder;
-        }
-    }
-
-    private void Zgrade_Drop(object sender, DragEventArgs e)
-    {
-        foreach (var file in DragDropHelper.GetDroppedFiles(e).Where(File.Exists))
-        {
-            AddZgradeFile(file);
-        }
+        ViewDashboard.SetSourceText(source);
+        ViewWalkBy.SetSourceText(source);
     }
 
     #endregion
 
     #region Browse buttons
 
-    private void BrowseXml_Click(object sender, RoutedEventArgs e)
+    private void BrowseXml()
     {
         var file = FilePickerService.PickXmlFile();
         if (file is not null)
         {
-            TxtXml.Text = file;
+            ViewWalkBy.XmlFile = file;
         }
     }
 
-    private void BrowseNbIot_Click(object sender, RoutedEventArgs e)
+    private void BrowseNbIot()
     {
         var file = FilePickerService.PickNbIotFile();
         if (file is not null)
         {
-            TxtNbIot.Text = file;
+            ViewNbIot.InputFile = file;
         }
     }
 
-    private void BrowseSource_Click(object sender, RoutedEventArgs e)
+    private void BrowseSource()
     {
         var file = FilePickerService.PickTextFile();
         if (file is not null)
         {
-            TxtSharedSource.Text = file;
+            ViewSettings.SharedSourceFile = file;
             UpdateSourceViews();
         }
     }
 
-    private void BrowseOutput_Click(object sender, RoutedEventArgs e)
+    private void BrowseOutput()
     {
         var folder = FilePickerService.PickOutputFolder();
         if (folder is not null)
         {
-            TxtOutput.Text = folder;
-            TxtNbOutput.Text = folder;
+            ViewWalkBy.OutputFolder = folder;
+            ViewNbIot.OutputFolder = folder;
         }
     }
 
-    private void BrowseZgrade_Click(object sender, RoutedEventArgs e)
+    private void BrowseZgrade()
     {
         foreach (var file in FilePickerService.PickZgradeFiles())
         {
             AddZgradeFile(file);
         }
     }
-
-    private void ClearZgrade_Click(object sender, RoutedEventArgs e) => _zgradeFiles.Clear();
 
     private void AddZgradeFile(string file)
     {
@@ -239,7 +217,7 @@ public partial class MainWindow : Window
 
     #region Settings
 
-    private void SaveSettings_Click(object sender, RoutedEventArgs e)
+    private void SaveSettings()
     {
         SaveSettingsFromUi();
         UpdateSourceViews();
@@ -250,21 +228,21 @@ public partial class MainWindow : Window
 
     #region Module actions
 
-    private void RunWalkBy_Click(object sender, RoutedEventArgs e)
+    private void RunWalkBy()
     {
         try
         {
-            var source = TxtSharedSource.Text.Trim();
+            var source = ViewSettings.SharedSourceFile.Trim();
 
-            if (!File.Exists(TxtXml.Text) || !File.Exists(source) || string.IsNullOrWhiteSpace(TxtOutput.Text))
+            if (!File.Exists(ViewWalkBy.XmlFile) || !File.Exists(source) || string.IsNullOrWhiteSpace(ViewWalkBy.OutputFolder))
             {
                 MessageBox.Show("Provjeri XML, Source u Postavkama i izlaznu mapu.");
                 return;
             }
 
-            var result = WalkByService.Process(TxtXml.Text, source, TxtOutput.Text);
-            LblWalkByStats.Text = $"XML: {result.XmlCount}   Matched: {result.Matched}   Missing: {result.Missing}";
-            TxtLogViewer.Text = LogViewerService.ReadSafe(result.LogPath);
+            var result = WalkByService.Process(ViewWalkBy.XmlFile, source, ViewWalkBy.OutputFolder);
+            ViewWalkBy.StatsText = $"XML: {result.XmlCount}   Matched: {result.Matched}   Missing: {result.Missing}";
+            ViewLogs.LogText = LogViewerService.ReadSafe(result.LogPath);
         }
         catch (Exception ex)
         {
@@ -272,24 +250,24 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RunNbIot_Click(object sender, RoutedEventArgs e)
+    private void RunNbIot()
     {
         try
         {
-            if (!File.Exists(TxtNbIot.Text) || string.IsNullOrWhiteSpace(TxtNbOutput.Text))
+            if (!File.Exists(ViewNbIot.InputFile) || string.IsNullOrWhiteSpace(ViewNbIot.OutputFolder))
             {
                 MessageBox.Show("Provjeri NB-IoT datoteku i izlaznu mapu.");
                 return;
             }
 
             var result = NbIotService.Process(
-                TxtNbIot.Text,
-                TxtNbOutput.Text,
-                DpExpectedDate.SelectedDate,
-                ChkCroatian.IsChecked == true);
+                ViewNbIot.InputFile,
+                ViewNbIot.OutputFolder,
+                ViewNbIot.ExpectedDate,
+                ViewNbIot.NormalizeCroatian);
 
-            LblNbStats.Text = $"Total: {result.Total}   Export: {result.Exported}   Missing UC: {result.MissingUserCode}   Date mismatch: {result.DateMismatch}";
-            TxtLogViewer.Text = LogViewerService.ReadSafe(result.LogPath);
+            ViewNbIot.StatsText = $"Total: {result.Total}   Export: {result.Exported}   Missing UC: {result.MissingUserCode}   Date mismatch: {result.DateMismatch}";
+            ViewLogs.LogText = LogViewerService.ReadSafe(result.LogPath);
         }
         catch (Exception ex)
         {
@@ -297,12 +275,15 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RunZgrade_Click(object sender, RoutedEventArgs e)
+    private void RunZgrade()
     {
         try
         {
-            var source = TxtSharedSource.Text.Trim();
-            var output = FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text, Path.GetDirectoryName(_zgradeFiles.FirstOrDefault() ?? string.Empty) ?? string.Empty);
+            var source = ViewSettings.SharedSourceFile.Trim();
+            var output = FirstNonEmpty(
+                ViewWalkBy.OutputFolder,
+                ViewNbIot.OutputFolder,
+                Path.GetDirectoryName(_zgradeFiles.FirstOrDefault() ?? string.Empty) ?? string.Empty);
 
             if (!File.Exists(source) || _zgradeFiles.Count == 0 || string.IsNullOrWhiteSpace(output))
             {
@@ -311,9 +292,9 @@ public partial class MainWindow : Window
             }
 
             var result = ZgradeService.Process(_zgradeFiles, source, output);
-            GridZgradeIssues.ItemsSource = result.IssueList;
-            LblZgradeStats.Text = $"Rows: {result.Total}   Issues: {result.Issues}   Lower: {result.Lower}   Duplicates: {result.Duplicates}";
-            TxtLogViewer.Text = LogViewerService.ReadSafe(result.LogPath);
+            ViewZgrade.IssuesSource = result.IssueList;
+            ViewZgrade.StatsText = $"Rows: {result.Total}   Issues: {result.Issues}   Lower: {result.Lower}   Duplicates: {result.Duplicates}";
+            ViewLogs.LogText = LogViewerService.ReadSafe(result.LogPath);
         }
         catch (Exception ex)
         {
@@ -325,21 +306,21 @@ public partial class MainWindow : Window
 
     #region Open output / logs
 
-    private void OpenOutput_Click(object sender, RoutedEventArgs e)
+    private void OpenOutputFolder()
     {
-        var directory = FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text);
+        var directory = FirstNonEmpty(ViewWalkBy.OutputFolder, ViewNbIot.OutputFolder);
         if (Directory.Exists(directory))
         {
             Process.Start(new ProcessStartInfo { FileName = directory, UseShellExecute = true });
         }
     }
 
-    private void OpenLog_Click(object sender, RoutedEventArgs e)
+    private void OpenLog()
     {
         var file = FilePickerService.PickLogFile();
         if (file is not null)
         {
-            TxtLogViewer.Text = LogViewerService.ReadSafe(file);
+            ViewLogs.LogText = LogViewerService.ReadSafe(file);
         }
     }
 
