@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,7 +45,7 @@ public partial class MainWindow : Window
         {
             WindowSettingsService.Capture(this, _settings);
             _settings.SharedSourceFile = TxtSharedSource.Text.Trim();
-            _settings.LastOutputFolder = UiHelper.FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text, _settings.LastOutputFolder);
+            _settings.LastOutputFolder = FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text, _settings.LastOutputFolder);
             SettingsService.Save(_settings);
         }
         catch
@@ -53,7 +54,8 @@ public partial class MainWindow : Window
         }
     }
 
-    // FirstNonEmpty moved to Helpers.UiHelper
+    private static string FirstNonEmpty(params string[] values)
+        => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
 
     #region Navigation
 
@@ -169,7 +171,7 @@ public partial class MainWindow : Window
     {
         foreach (var file in DragDropHelper.GetDroppedFiles(e).Where(File.Exists))
         {
-            _zgradeFiles.AddIfNotExists(file);
+            AddZgradeFile(file);
         }
     }
 
@@ -219,11 +221,19 @@ public partial class MainWindow : Window
     {
         foreach (var file in FilePickerService.PickZgradeFiles())
         {
-            _zgradeFiles.AddIfNotExists(file);
+            AddZgradeFile(file);
         }
     }
 
     private void ClearZgrade_Click(object sender, RoutedEventArgs e) => _zgradeFiles.Clear();
+
+    private void AddZgradeFile(string file)
+    {
+        if (!_zgradeFiles.Contains(file))
+        {
+            _zgradeFiles.Add(file);
+        }
+    }
 
     #endregion
 
@@ -292,7 +302,7 @@ public partial class MainWindow : Window
         try
         {
             var source = TxtSharedSource.Text.Trim();
-            var output = UiHelper.FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text, Path.GetDirectoryName(_zgradeFiles.FirstOrDefault() ?? string.Empty) ?? string.Empty);
+            var output = FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text, Path.GetDirectoryName(_zgradeFiles.FirstOrDefault() ?? string.Empty) ?? string.Empty);
 
             if (!File.Exists(source) || _zgradeFiles.Count == 0 || string.IsNullOrWhiteSpace(output))
             {
@@ -317,8 +327,11 @@ public partial class MainWindow : Window
 
     private void OpenOutput_Click(object sender, RoutedEventArgs e)
     {
-        var directory = UiHelper.FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text);
-        SystemService.OpenFolder(directory);
+        var directory = FirstNonEmpty(TxtOutput.Text, TxtNbOutput.Text);
+        if (Directory.Exists(directory))
+        {
+            Process.Start(new ProcessStartInfo { FileName = directory, UseShellExecute = true });
+        }
     }
 
     private void OpenLog_Click(object sender, RoutedEventArgs e)
