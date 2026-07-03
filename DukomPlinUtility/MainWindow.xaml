@@ -183,7 +183,7 @@
                                FontSize="15"
                                FontWeight="SemiBold"
                                TextAlignment="Center" />
-                    <TextBlock Text="v1.3.3"
+                    <TextBlock Text="v1.3.4"
                                Foreground="#D6DEE8"
                                FontSize="14"
                                TextAlignment="Center"
@@ -221,7 +221,7 @@
                         <TextBlock Text="● OK" Foreground="#35B84A" FontWeight="SemiBold" />
                     </StackPanel>
                     <TextBlock Grid.Column="2" Text="{Binding StatusDetails}" Foreground="#E9EEF5" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="3" Text="Verzija: v1.3.3" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="Verzija: v1.3.4" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Center" />
                     <ProgressBar Grid.Column="4" Minimum="0" Maximum="100" Value="{Binding ProgressValue}" Height="12" VerticalAlignment="Center" Margin="14,0,0,0" />
                 </Grid>
             </Border>

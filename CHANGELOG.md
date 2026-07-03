@@ -1,3 +1,10 @@
+## v1.3.4 - Functional Result Filters
+
+- Filter buttons now work in WalkBy preview.
+- Filter buttons now work in NB-IoT preview.
+- Added search filtering for WalkBy and NB-IoT preview tables.
+- Added filter/search support to Zgrade issue table.
+
 
 ## v1.3.3 - Sidebar and Drag & Drop Fix
 - Fixed sidebar icon alignment and forced white icons/text in navigation.

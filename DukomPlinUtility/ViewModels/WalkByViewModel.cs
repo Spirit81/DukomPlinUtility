@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Data;
 using DukomPlinUtility.Infrastructure;
 using DukomPlinUtility.Models;
 using DukomPlinUtility.Services;
@@ -27,6 +29,8 @@ public sealed class WalkByViewModel : ViewModelBase
     private string _durationText = "-";
     private string _lastRunText = "-";
     private string _previewTotalText = "Ukupno: 0";
+    private string _searchText = string.Empty;
+    private string _activeFilter = "All";
 
     public WalkByViewModel(Func<string> getSharedSource, LogsViewModel logs, DashboardViewModel dashboard, Action<string, string, double, bool> setStatus, Action<AppModule> navigate)
     {
@@ -40,6 +44,12 @@ public sealed class WalkByViewModel : ViewModelBase
         OpenSettingsCommand = new RelayCommand(() => _navigate(AppModule.Settings));
         RunCommand = new RelayCommand(Run);
         OpenOutputCommand = new RelayCommand(OpenOutputFolder);
+        ShowAllCommand = new RelayCommand(() => SetFilter("All"));
+        ShowOkCommand = new RelayCommand(() => SetFilter("OK"));
+        ShowWarningCommand = new RelayCommand(() => SetFilter("Warning"));
+        ShowErrorCommand = new RelayCommand(() => SetFilter("Error"));
+        PreviewView = CollectionViewSource.GetDefaultView(PreviewItems);
+        PreviewView.Filter = FilterPreviewItem;
     }
 
     public string XmlFile { get => _xmlFile; set => SetProperty(ref _xmlFile, value); }
@@ -53,13 +63,30 @@ public sealed class WalkByViewModel : ViewModelBase
     public string DurationText { get => _durationText; set => SetProperty(ref _durationText, value); }
     public string LastRunText { get => _lastRunText; set => SetProperty(ref _lastRunText, value); }
     public string PreviewTotalText { get => _previewTotalText; set => SetProperty(ref _previewTotalText, value); }
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetProperty(ref _searchText, value))
+            {
+                RefreshPreview();
+            }
+        }
+    }
+    public string ActiveFilter { get => _activeFilter; set => SetProperty(ref _activeFilter, value); }
     public ObservableCollection<ValidationItem> PreviewItems { get; } = new();
+    public ICollectionView PreviewView { get; }
 
     public ICommand BrowseXmlCommand { get; }
     public ICommand BrowseOutputCommand { get; }
     public ICommand OpenSettingsCommand { get; }
     public ICommand RunCommand { get; }
     public ICommand OpenOutputCommand { get; }
+    public ICommand ShowAllCommand { get; }
+    public ICommand ShowOkCommand { get; }
+    public ICommand ShowWarningCommand { get; }
+    public ICommand ShowErrorCommand { get; }
 
     private void BrowseXml()
     {
@@ -98,7 +125,6 @@ public sealed class WalkByViewModel : ViewModelBase
             SuccessText = result.XmlCount > 0 ? $"{(result.Matched * 100.0 / result.XmlCount):N2} %" : "-";
             DurationText = sw.Elapsed.ToString(@"hh\:mm\:ss");
             LastRunText = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-            PreviewTotalText = $"Ukupno: {result.Preview.Count:N0}";
             _logs.LogText = LogViewerService.ReadSafe(result.LogPath);
             LoadPreview(result.Preview);
             _dashboard.UpdateWalkBy(result.XmlCount, result.Matched, result.Missing);
@@ -118,7 +144,46 @@ public sealed class WalkByViewModel : ViewModelBase
         {
             PreviewItems.Add(item);
         }
+        RefreshPreview();
     }
+
+    private void SetFilter(string filter)
+    {
+        ActiveFilter = filter;
+        RefreshPreview();
+    }
+
+    private bool FilterPreviewItem(object item)
+    {
+        if (item is not ValidationItem validationItem) return false;
+
+        if (!string.Equals(ActiveFilter, "All", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(validationItem.StatusLevel, ActiveFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(SearchText)) return true;
+
+        var query = SearchText.Trim();
+        return Contains(validationItem.UserCode, query) ||
+               Contains(validationItem.Name, query) ||
+               Contains(validationItem.Meter, query) ||
+               Contains(validationItem.Reading, query) ||
+               Contains(validationItem.PreviousReading, query) ||
+               Contains(validationItem.Date, query) ||
+               Contains(validationItem.Status, query) ||
+               Contains(validationItem.Message, query);
+    }
+
+    private void RefreshPreview()
+    {
+        PreviewView.Refresh();
+        PreviewTotalText = $"Ukupno: {PreviewView.Cast<object>().Count():N0}";
+    }
+
+    private static bool Contains(string? value, string query)
+        => !string.IsNullOrEmpty(value) && value.Contains(query, StringComparison.OrdinalIgnoreCase);
 
     private void OpenOutputFolder()
     {

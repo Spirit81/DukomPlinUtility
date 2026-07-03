@@ -51,15 +51,26 @@
                 <Grid Grid.Row="0" Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="240" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Pregled grešaka / upozorenja" FontSize="22" FontWeight="Bold" />
-                    <TextBlock Grid.Column="2" Text="{Binding StatsText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Text="Pregled grešaka / upozorenja" FontSize="22" FontWeight="Bold" Margin="0,0,18,0" />
+                    <TextBlock Grid.Column="1" Text="Filter:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <Button Grid.Column="2" Content="Sve" Style="{StaticResource PrimaryButton}" MinWidth="90" Padding="12,8" Command="{Binding ShowAllCommand}" />
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <Button Content="Warning" MinWidth="110" Foreground="{StaticResource WarningBrush}" Command="{Binding ShowWarningCommand}" />
+                        <Button Content="Error" MinWidth="90" Foreground="{StaticResource RedBrush}" Command="{Binding ShowErrorCommand}" />
+                    </StackPanel>
+                    <TextBox Grid.Column="5" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="Pretraži po User Code, brojilu, stanju ili statusu." />
+                    <TextBlock Grid.Column="6" Text="{Binding StatsText}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0" />
                 </Grid>
 
                 <DataGrid Grid.Row="1"
-                          ItemsSource="{Binding Issues}"
+                          ItemsSource="{Binding IssuesView}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           RowStyle="{StaticResource ValidationRowStyle}"

@@ -130,18 +130,18 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="Pregled rezultata" FontSize="22" FontWeight="Bold" Margin="0,0,18,0" />
                     <TextBlock Grid.Column="1" Text="Filter:" VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <Button Grid.Column="2" Content="Sve" Style="{StaticResource PrimaryButton}" MinWidth="90" Padding="12,8" />
-                    <Button Grid.Column="3" Content="OK" MinWidth="90" />
+                    <Button Grid.Column="2" Content="Sve" Style="{StaticResource PrimaryButton}" MinWidth="90" Padding="12,8" Command="{Binding ShowAllCommand}" />
+                    <Button Grid.Column="3" Content="OK" MinWidth="90" Command="{Binding ShowOkCommand}" />
                     <StackPanel Grid.Column="4" Orientation="Horizontal">
-                        <Button Content="Warning" MinWidth="110" Foreground="{StaticResource WarningBrush}" />
-                        <Button Content="Error" MinWidth="90" Foreground="{StaticResource RedBrush}" />
+                        <Button Content="Warning" MinWidth="110" Foreground="{StaticResource WarningBrush}" Command="{Binding ShowWarningCommand}" />
+                        <Button Content="Error" MinWidth="90" Foreground="{StaticResource RedBrush}" Command="{Binding ShowErrorCommand}" />
                     </StackPanel>
-                    <TextBox Grid.Column="5" Text="" ToolTip="Pretraživanje će biti dodano u sljedećoj verziji." />
+                    <TextBox Grid.Column="5" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="Pretraži po User Code, korisniku, brojilu, stanju, datumu ili statusu." />
                     <TextBlock Grid.Column="6" Text="{Binding PreviewTotalText}" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" />
                 </Grid>
 
                 <DataGrid Grid.Row="1"
-                          ItemsSource="{Binding PreviewItems}"
+                          ItemsSource="{Binding PreviewView}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserSortColumns="True"
