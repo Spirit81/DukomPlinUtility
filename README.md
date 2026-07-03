@@ -1,0 +1,2 @@
+# DukomPlinUtility
+app za ocitanja
