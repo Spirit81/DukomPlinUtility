@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:DukomPlinUtility.Views"
         xmlns:vm="clr-namespace:DukomPlinUtility.ViewModels"
-        Title="DUKOM PLIN Utility Professional" Height="950" Width="1800"
+        Title="Dukom Plin Utility" Height="950" Width="1800"
         MinHeight="850" MinWidth="1400" WindowStartupLocation="CenterScreen"
         Background="{StaticResource BgBrush}">
     <Window.Resources>
@@ -31,65 +31,198 @@
 
         <Style x:Key="NavButton" TargetType="Button">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Padding" Value="18,12" />
-            <Setter Property="Margin" Value="8,4" />
+            <Setter Property="Padding" Value="20,14" />
+            <Setter Property="Margin" Value="0" />
             <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#F2F6FA" />
             <Setter Property="BorderBrush" Value="Transparent" />
-            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1A2531" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#0B63D8" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="270" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#E3E7EC" BorderThickness="0,0,1,0">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Margin="18">
-                    <Image Source="Assets/logo.png" Height="160" Stretch="Uniform" Margin="0,10,0,12"/>
-                    <TextBlock Text="DUKOM PLIN" FontSize="30" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" />
-                    <TextBlock Text="UTILITY" FontSize="24" FontWeight="Bold" Foreground="#F57C00" HorizontalAlignment="Center" />
-                    <TextBlock Text="Professional" FontSize="17" Foreground="#F57C00" HorizontalAlignment="Center" Margin="0,3,0,22"/>
-                    <Button Style="{StaticResource NavButton}" Content="🏠  Dashboard" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
-                    <Button Style="{StaticResource NavButton}" Content="📡  WalkBy" Command="{Binding NavigateCommand}" CommandParameter="WalkBy" />
-                    <Button Style="{StaticResource NavButton}" Content="📶  NB-IoT" Command="{Binding NavigateCommand}" CommandParameter="NbIot" />
-                    <Button Style="{StaticResource NavButton}" Content="🏢  Zgrade" Command="{Binding NavigateCommand}" CommandParameter="Zgrade" />
-                    <Button Style="{StaticResource NavButton}" Content="📄  Logovi" Command="{Binding NavigateCommand}" CommandParameter="Logs" />
-                    <Button Style="{StaticResource NavButton}" Content="⚙️  Postavke" Command="{Binding NavigateCommand}" CommandParameter="Settings" />
-                    <Button Style="{StaticResource NavButton}" Content="ℹ️  O programu" Command="{Binding NavigateCommand}" CommandParameter="About" />
+        <!-- Left navigation -->
+        <Border Grid.Column="0" Background="#0F1822">
+            <DockPanel LastChildFill="True">
+                <!-- Brand header -->
+                <StackPanel DockPanel.Dock="Top" Margin="0,26,0,0">
+                    <Image Source="Assets/logo.png"
+                           Width="112"
+                           Height="96"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10" />
+
+                    <TextBlock Text="DUKOM PLIN"
+                               Foreground="White"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock Text="UTILITY"
+                               Foreground="#2F8CFF"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,2,0,0" />
+
+                    <Separator Margin="18,18,18,16"
+                               Background="#E5EDF7"
+                               Opacity="0.85" />
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Bottom" Margin="18">
-                    <TextBlock Text="Tema" Foreground="#555" />
-                    <ComboBox SelectedIndex="0" Margin="0,5,0,10">
-                        <ComboBoxItem Content="Svijetla" />
-                    </ComboBox>
-                    <TextBlock Text="● Spreman" Foreground="#22A735" FontWeight="SemiBold" />
+
+                <!-- Navigation buttons -->
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,0">
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE80F;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="Dashboard" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="WalkBy">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE726;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="WalkBy" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="NbIot">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xEC3F;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="NB-IoT" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Zgrade">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE80C;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="Zgrade" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Logs">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="Logs" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Settings">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="Settings" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="About">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="About" FontSize="17" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+                </StackPanel>
+
+                <!-- Sidebar footer -->
+                <StackPanel DockPanel.Dock="Bottom" Margin="22,0,22,26">
+                    <TextBlock Text="DUKOM PLIN Utility"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               TextAlignment="Center" />
+                    <TextBlock Text="v1.3.3"
+                               Foreground="#D6DEE8"
+                               FontSize="14"
+                               TextAlignment="Center"
+                               Margin="0,4,0,24" />
+                    <TextBlock Text="● Ready"
+                               Foreground="#35B84A"
+                               FontWeight="Bold"
+                               FontSize="14" />
                 </StackPanel>
             </DockPanel>
         </Border>
 
-        <Grid Grid.Column="1" Margin="16">
+        <!-- Main content -->
+        <Grid Grid.Column="1" Background="#F3F6FA">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="38"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="42" />
             </Grid.RowDefinitions>
 
             <ContentControl Grid.Row="0" Content="{Binding CurrentViewModel}" />
 
-            <Border Grid.Row="1" Background="White" BorderBrush="#E3E7EC" BorderThickness="1" CornerRadius="6" Padding="8,4">
+            <Border Grid.Row="1" Background="#111820" BorderBrush="#0A0F14" BorderThickness="1,0,0,0" Padding="18,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="220" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="190" />
                         <ColumnDefinition Width="260" />
-                        <ColumnDefinition Width="130" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="110" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="{Binding StatusText}" Foreground="#F57C00" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="1" Text="{Binding StatusDetails}" Foreground="#607D8B" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                    <ProgressBar Grid.Column="2" Minimum="0" Maximum="100" Value="{Binding ProgressValue}" Height="14" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="3" Text="v1.3.0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#607D8B" />
+                    <TextBlock Grid.Column="0" Text="● Ready" Foreground="#35B84A" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Shared Source:" Foreground="White" Margin="0,0,10,0" />
+                        <TextBlock Text="● OK" Foreground="#35B84A" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding StatusDetails}" Foreground="#E9EEF5" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="Verzija: v1.3.3" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    <ProgressBar Grid.Column="4" Minimum="0" Maximum="100" Value="{Binding ProgressValue}" Height="12" VerticalAlignment="Center" Margin="14,0,0,0" />
                 </Grid>
             </Border>
         </Grid>

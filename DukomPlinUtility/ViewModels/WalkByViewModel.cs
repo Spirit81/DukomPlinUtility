@@ -20,6 +20,13 @@ public sealed class WalkByViewModel : ViewModelBase
     private string _outputFolder = string.Empty;
     private string _sourceText = "Source nije postavljen";
     private string _statsText = string.Empty;
+    private string _xmlCountText = "-";
+    private string _matchedText = "-";
+    private string _missingText = "-";
+    private string _successText = "-";
+    private string _durationText = "-";
+    private string _lastRunText = "-";
+    private string _previewTotalText = "Ukupno: 0";
 
     public WalkByViewModel(Func<string> getSharedSource, LogsViewModel logs, DashboardViewModel dashboard, Action<string, string, double, bool> setStatus, Action<AppModule> navigate)
     {
@@ -39,6 +46,13 @@ public sealed class WalkByViewModel : ViewModelBase
     public string OutputFolder { get => _outputFolder; set => SetProperty(ref _outputFolder, value); }
     public string SourceText { get => _sourceText; set => SetProperty(ref _sourceText, value); }
     public string StatsText { get => _statsText; set => SetProperty(ref _statsText, value); }
+    public string XmlCountText { get => _xmlCountText; set => SetProperty(ref _xmlCountText, value); }
+    public string MatchedText { get => _matchedText; set => SetProperty(ref _matchedText, value); }
+    public string MissingText { get => _missingText; set => SetProperty(ref _missingText, value); }
+    public string SuccessText { get => _successText; set => SetProperty(ref _successText, value); }
+    public string DurationText { get => _durationText; set => SetProperty(ref _durationText, value); }
+    public string LastRunText { get => _lastRunText; set => SetProperty(ref _lastRunText, value); }
+    public string PreviewTotalText { get => _previewTotalText; set => SetProperty(ref _previewTotalText, value); }
     public ObservableCollection<ValidationItem> PreviewItems { get; } = new();
 
     public ICommand BrowseXmlCommand { get; }
@@ -74,8 +88,17 @@ public sealed class WalkByViewModel : ViewModelBase
             }
 
             _setStatus("WalkBy obrada u tijeku", Path.GetFileName(XmlFile), 15, true);
+            var sw = Stopwatch.StartNew();
             var result = WalkByService.Process(XmlFile, source, OutputFolder);
+            sw.Stop();
             StatsText = $"XML: {result.XmlCount}   Matched: {result.Matched}   Missing: {result.Missing}";
+            XmlCountText = result.XmlCount.ToString("N0");
+            MatchedText = result.Matched.ToString("N0");
+            MissingText = result.Missing.ToString("N0");
+            SuccessText = result.XmlCount > 0 ? $"{(result.Matched * 100.0 / result.XmlCount):N2} %" : "-";
+            DurationText = sw.Elapsed.ToString(@"hh\:mm\:ss");
+            LastRunText = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            PreviewTotalText = $"Ukupno: {result.Preview.Count:N0}";
             _logs.LogText = LogViewerService.ReadSafe(result.LogPath);
             LoadPreview(result.Preview);
             _dashboard.UpdateWalkBy(result.XmlCount, result.Matched, result.Missing);

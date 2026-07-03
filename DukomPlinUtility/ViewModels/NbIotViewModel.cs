@@ -19,6 +19,13 @@ public sealed class NbIotViewModel : ViewModelBase
     private DateTime? _expectedDate = DateTime.Today;
     private bool _normalizeCroatian = true;
     private string _statsText = string.Empty;
+    private string _totalText = "-";
+    private string _exportedText = "-";
+    private string _missingUserCodeText = "-";
+    private string _dateMismatchText = "-";
+    private string _durationText = "-";
+    private string _lastRunText = "-";
+    private string _previewTotalText = "Ukupno: 0";
 
     public NbIotViewModel(LogsViewModel logs, DashboardViewModel dashboard, Action<string, string, double, bool> setStatus)
     {
@@ -36,6 +43,13 @@ public sealed class NbIotViewModel : ViewModelBase
     public DateTime? ExpectedDate { get => _expectedDate; set => SetProperty(ref _expectedDate, value); }
     public bool NormalizeCroatian { get => _normalizeCroatian; set => SetProperty(ref _normalizeCroatian, value); }
     public string StatsText { get => _statsText; set => SetProperty(ref _statsText, value); }
+    public string TotalText { get => _totalText; set => SetProperty(ref _totalText, value); }
+    public string ExportedText { get => _exportedText; set => SetProperty(ref _exportedText, value); }
+    public string MissingUserCodeText { get => _missingUserCodeText; set => SetProperty(ref _missingUserCodeText, value); }
+    public string DateMismatchText { get => _dateMismatchText; set => SetProperty(ref _dateMismatchText, value); }
+    public string DurationText { get => _durationText; set => SetProperty(ref _durationText, value); }
+    public string LastRunText { get => _lastRunText; set => SetProperty(ref _lastRunText, value); }
+    public string PreviewTotalText { get => _previewTotalText; set => SetProperty(ref _previewTotalText, value); }
     public ObservableCollection<ValidationItem> PreviewItems { get; } = new();
 
     public ICommand BrowseInputCommand { get; }
@@ -69,8 +83,17 @@ public sealed class NbIotViewModel : ViewModelBase
             }
 
             _setStatus("NB-IoT obrada u tijeku", Path.GetFileName(InputFile), 15, true);
+            var sw = Stopwatch.StartNew();
             var result = NbIotService.Process(InputFile, OutputFolder, ExpectedDate, NormalizeCroatian);
+            sw.Stop();
             StatsText = $"Total: {result.Total}   Export: {result.Exported}   Missing UC: {result.MissingUserCode}   Date mismatch: {result.DateMismatch}";
+            TotalText = result.Total.ToString("N0");
+            ExportedText = result.Exported.ToString("N0");
+            MissingUserCodeText = result.MissingUserCode.ToString("N0");
+            DateMismatchText = result.DateMismatch.ToString("N0");
+            DurationText = sw.Elapsed.ToString(@"hh\:mm\:ss");
+            LastRunText = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            PreviewTotalText = $"Ukupno: {result.Preview.Count:N0}";
             _logs.LogText = LogViewerService.ReadSafe(result.LogPath);
             LoadPreview(result.Preview);
             _dashboard.UpdateNbIot(result.Total, result.Exported, result.MissingUserCode, result.DateMismatch);

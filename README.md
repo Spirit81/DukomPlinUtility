@@ -62,6 +62,6 @@ Preporučeni branch workflow:
 
 This version starts code cleanup after the initial Git version. MainWindow still owns the UI, but common logic has been moved into Services/Helpers so future modules can be added with less risk.
 
-## v1.3.0 Operations Center
+## v1.3.3 Operations Center
 
 This version adds a live dashboard overview after module processing, global status/progress bar and colored validation rows.
