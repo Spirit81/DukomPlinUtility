@@ -11,26 +11,14 @@
             <Setter Property="Padding" Value="18" />
             <Setter Property="Margin" Value="10" />
         </Style>
-        <Style x:Key="OrangeButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#F57C00" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="BorderBrush" Value="#F57C00" />
-        </Style>
-        <Style x:Key="GreenButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#22A735" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="BorderBrush" Value="#22A735" />
-        </Style>
     </UserControl.Resources>
 
     <StackPanel>
         <TextBlock Text="Logovi" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10"/>
         <Border Style="{StaticResource Card}">
             <StackPanel>
-                <Button Content="Učitaj log" Click="OpenLog_Click" Width="120" HorizontalAlignment="Left"/>
-                <TextBox x:Name="TxtLogViewer" FontFamily="Consolas" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="620"/>
+                <Button Content="Učitaj log" Command="{Binding OpenLogCommand}" Width="120" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding LogText, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="620"/>
             </StackPanel>
         </Border>
     </StackPanel>
