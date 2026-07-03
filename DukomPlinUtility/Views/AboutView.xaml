@@ -27,6 +27,6 @@
 
     <StackPanel>
         <TextBlock Text="O programu" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10"/>
-        <Border Style="{StaticResource Card}"><TextBlock Text="DUKOM PLIN Utility Professional&#10;Verzija 1.0.1&#10;&#10;Moduli: WalkBy, NB-IoT, Zgrade, Logovi, Postavke." FontSize="16"/></Border>
+        <Border Style="{StaticResource Card}"><TextBlock Text="DUKOM PLIN Utility Professional&#10;Verzija 1.1.0&#10;&#10;Moduli: WalkBy, NB-IoT, Zgrade, Logovi, Postavke." FontSize="16"/></Border>
     </StackPanel>
 </UserControl>

@@ -17,12 +17,6 @@
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="BorderBrush" Value="#F57C00" />
         </Style>
-        <Style x:Key="GreenButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#22A735" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="BorderBrush" Value="#22A735" />
-        </Style>
     </UserControl.Resources>
 
     <StackPanel>
@@ -30,12 +24,12 @@
         <Border Style="{StaticResource Card}" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Zgrade_Drop">
             <StackPanel>
                 <TextBlock FontWeight="Bold">Dodaj TXT fajlove zgrada (drag and drop ili Browse). Drag and drop ovdje ne mijenja Shared Source.</TextBlock>
-                <StackPanel Orientation="Horizontal" Margin="0,10"><Button Content="Dodaj TXT fajlove" Click="BrowseZgrade_Click"/><Button Content="Clear" Click="ClearZgrade_Click"/><Button Style="{StaticResource OrangeButton}" Content="Pokreni provjeru" Click="RunZgrade_Click"/><TextBlock x:Name="LblZgradeStats" Margin="20,8" FontWeight="Bold"/></StackPanel>
-                <ListBox x:Name="ListZgradeFiles" Height="90"/>
+                <StackPanel Orientation="Horizontal" Margin="0,10"><Button Content="Dodaj TXT fajlove" Command="{Binding BrowseFilesCommand}"/><Button Content="Clear" Command="{Binding ClearCommand}"/><Button Style="{StaticResource OrangeButton}" Content="Pokreni provjeru" Command="{Binding RunCommand}"/><Button Content="Otvori izlaz" Command="{Binding OpenOutputCommand}"/><TextBlock Text="{Binding StatsText}" Margin="20,8" FontWeight="Bold"/></StackPanel>
+                <ListBox ItemsSource="{Binding Files}" Height="90"/>
             </StackPanel>
         </Border>
         <Border Style="{StaticResource Card}">
-            <DockPanel><TextBlock DockPanel.Dock="Top" Text="Pregled grešaka / upozorenja" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/><DataGrid x:Name="GridZgradeIssues" AutoGenerateColumns="True" Height="360" IsReadOnly="True"/></DockPanel>
+            <DockPanel><TextBlock DockPanel.Dock="Top" Text="Pregled grešaka / upozorenja" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/><DataGrid ItemsSource="{Binding Issues}" AutoGenerateColumns="True" Height="360" IsReadOnly="True"/></DockPanel>
         </Border>
     </StackPanel>
 </UserControl>

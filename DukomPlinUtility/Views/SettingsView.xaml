@@ -11,18 +11,6 @@
             <Setter Property="Padding" Value="18" />
             <Setter Property="Margin" Value="10" />
         </Style>
-        <Style x:Key="OrangeButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#F57C00" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="BorderBrush" Value="#F57C00" />
-        </Style>
-        <Style x:Key="GreenButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#22A735" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="BorderBrush" Value="#22A735" />
-        </Style>
     </UserControl.Resources>
 
     <StackPanel>
@@ -30,9 +18,9 @@
         <Border Style="{StaticResource Card}">
             <StackPanel>
                 <TextBlock Text="Shared Source (ZaRtf.txt iz KODING-a - STA + PRI)" FontWeight="Bold"/>
-                <DockPanel Margin="0,8"><Button Content="Browse" DockPanel.Dock="Right" Click="BrowseSource_Click"/><TextBox x:Name="TxtSharedSource" ToolTip="Ovdje učitati ZaRtf.txt očitačku listu iz KODING-a - STA + PRI."/></DockPanel>
+                <DockPanel Margin="0,8"><Button Content="Browse" DockPanel.Dock="Right" Command="{Binding BrowseSourceCommand}"/><TextBox Text="{Binding SharedSourceFile, UpdateSourceTrigger=PropertyChanged}" ToolTip="Ovdje učitati ZaRtf.txt očitačku listu iz KODING-a - STA + PRI."/></DockPanel>
                 <TextBlock Text="Koristi se za WalkBy, NB-IoT i Zgrade module." Foreground="#555"/>
-                <Button Content="Spremi postavke" Width="150" Margin="0,18,0,0" HorizontalAlignment="Left" Click="SaveSettings_Click"/>
+                <Button Content="Spremi postavke" Width="150" Margin="0,18,0,0" HorizontalAlignment="Left" Command="{Binding SaveCommand}"/>
             </StackPanel>
         </Border>
     </StackPanel>
