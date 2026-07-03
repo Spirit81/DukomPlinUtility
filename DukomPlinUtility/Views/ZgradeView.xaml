@@ -17,19 +17,68 @@
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="BorderBrush" Value="#F57C00" />
         </Style>
+        <Style x:Key="ZgradeRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="#EAF7EA" />
+            <Setter Property="Foreground" Value="#1B5E20" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding StatusLevel}" Value="OK">
+                    <Setter Property="Background" Value="#EAF7EA" />
+                    <Setter Property="Foreground" Value="#1B5E20" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StatusLevel}" Value="Warning">
+                    <Setter Property="Background" Value="#FFF4D6" />
+                    <Setter Property="Foreground" Value="#9A6500" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StatusLevel}" Value="Error">
+                    <Setter Property="Background" Value="#FFE1E1" />
+                    <Setter Property="Foreground" Value="#B00020" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
-    <StackPanel>
-        <TextBlock Text="Zgrade" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
-        <Border Style="{StaticResource Card}" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Zgrade_Drop">
-            <StackPanel>
-                <TextBlock FontWeight="Bold">Dodaj TXT fajlove zgrada (drag and drop ili Browse). Drag and drop ovdje ne mijenja Shared Source.</TextBlock>
-                <StackPanel Orientation="Horizontal" Margin="0,10"><Button Content="Dodaj TXT fajlove" Command="{Binding BrowseFilesCommand}"/><Button Content="Clear" Command="{Binding ClearCommand}"/><Button Style="{StaticResource OrangeButton}" Content="Pokreni provjeru" Command="{Binding RunCommand}"/><Button Content="Otvori izlaz" Command="{Binding OpenOutputCommand}"/><TextBlock Text="{Binding StatsText}" Margin="20,8" FontWeight="Bold"/></StackPanel>
-                <ListBox ItemsSource="{Binding Files}" Height="90"/>
-            </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Zgrade" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
+            <Border Style="{StaticResource Card}" Background="White" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Zgrade_Drop">
+                <StackPanel>
+                    <TextBlock FontWeight="Bold" IsHitTestVisible="False">Dodaj TXT fajlove zgrada (drag and drop ili Browse). Drag and drop ovdje ne mijenja Shared Source.</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10">
+                        <Button Content="Dodaj TXT fajlove" Command="{Binding BrowseFilesCommand}"/>
+                        <Button Content="Clear" Command="{Binding ClearCommand}"/>
+                        <Button Style="{StaticResource OrangeButton}" Content="Pokreni provjeru" Command="{Binding RunCommand}"/>
+                        <Button Content="Otvori izlaz" Command="{Binding OpenOutputCommand}"/>
+                        <TextBlock Text="{Binding StatsText}" Margin="20,8" FontWeight="Bold"/>
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding Files}" Height="90" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Zgrade_Drop"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Pregled grešaka / upozorenja" FontWeight="Bold" FontSize="16" Margin="0,0,0,8" />
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Issues}" AutoGenerateColumns="False" IsReadOnly="True" RowStyle="{StaticResource ZgradeRowStyle}"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" EnableRowVirtualization="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="User Code" Binding="{Binding UserCode}" Width="110" />
+                        <DataGridTextColumn Header="Brojilo" Binding="{Binding Meter}" Width="130" />
+                        <DataGridTextColumn Header="Source" Binding="{Binding SourceReading}" Width="100" />
+                        <DataGridTextColumn Header="Novo" Binding="{Binding NewReading}" Width="100" />
+                        <DataGridTextColumn Header="Razlika" Binding="{Binding Difference}" Width="100" />
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="140" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </Border>
-        <Border Style="{StaticResource Card}">
-            <DockPanel><TextBlock DockPanel.Dock="Top" Text="Pregled grešaka / upozorenja" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/><DataGrid ItemsSource="{Binding Issues}" AutoGenerateColumns="True" Height="360" IsReadOnly="True"/></DockPanel>
-        </Border>
-    </StackPanel>
+    </Grid>
 </UserControl>

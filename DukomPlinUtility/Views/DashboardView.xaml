@@ -7,41 +7,114 @@
             <Setter Property="Background" Value="White" />
             <Setter Property="BorderBrush" Value="#DDE2E8" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="CornerRadius" Value="10" />
             <Setter Property="Padding" Value="18" />
             <Setter Property="Margin" Value="10" />
+        </Style>
+
+        <Style x:Key="ClickableCard" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style x:Key="StatusPill" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="9,4" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Background" Value="#EAF7EA" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding StatusLevel}" Value="Warning">
+                    <Setter Property="Background" Value="#FFF4D6" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StatusLevel}" Value="Error">
+                    <Setter Property="Background" Value="#FFE1E1" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <StackPanel>
-        <TextBlock Text="Dashboard" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
-        <UniformGrid Columns="3">
-            <Border Style="{StaticResource Card}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="10">
+            <TextBlock Text="Operations Center" FontSize="28" FontWeight="Bold" Foreground="#F57C00" />
+            <TextBlock Text="Brzi pregled izvora, zadnjih obrada i kontrola." Foreground="#607D8B" Margin="0,4,0,0" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Shared Source (ZaRtf.txt)" FontSize="18" FontWeight="Bold" />
+                    <TextBlock Text="{Binding SourceStatus}" Margin="0,8,0,0" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding SourceDetails}" Margin="0,5,0,0" Foreground="#607D8B" />
+                    <TextBlock Text="{Binding SourceText}" Margin="0,5,0,0" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Content="Otvori Postavke" Command="{Binding OpenSettingsCommand}" Width="145" Height="38" />
+            </Grid>
+        </Border>
+
+        <UniformGrid Grid.Row="2" Columns="3">
+            <Border Style="{StaticResource ClickableCard}">
                 <Border.InputBindings>
                     <MouseBinding MouseAction="LeftClick" Command="{Binding OpenWalkByCommand}" />
                 </Border.InputBindings>
-                <StackPanel><TextBlock Text="📡 WalkBy" FontSize="22" FontWeight="Bold"/><TextBlock Text="Holosys WalkBy XML + ZaRtf.txt" Margin="0,8,0,0"/></StackPanel>
+                <StackPanel>
+                    <TextBlock Text="📡 WalkBy" FontSize="24" FontWeight="Bold" />
+                    <TextBlock Text="Holosys XML + ZaRtf.txt" Foreground="#607D8B" Margin="0,4,0,12" />
+                    <Border Style="{StaticResource StatusPill}" DataContext="{Binding WalkBySummary}">
+                        <TextBlock Text="{Binding Status}" FontWeight="Bold" />
+                    </Border>
+                    <TextBlock Text="{Binding WalkBySummary.LastRun}" Margin="0,14,0,0" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding WalkBySummary.MainStat}" Margin="0,8,0,0" />
+                    <TextBlock Text="{Binding WalkBySummary.SecondaryStat}" />
+                    <TextBlock Text="{Binding WalkBySummary.WarningStat}" Foreground="#F57C00" FontWeight="SemiBold" />
+                    <Button Content="OPEN" Command="{Binding OpenWalkByCommand}" Width="100" HorizontalAlignment="Left" Margin="0,18,0,0" />
+                </StackPanel>
             </Border>
-            <Border Style="{StaticResource Card}">
+
+            <Border Style="{StaticResource ClickableCard}">
                 <Border.InputBindings>
                     <MouseBinding MouseAction="LeftClick" Command="{Binding OpenNbIotCommand}" />
                 </Border.InputBindings>
-                <StackPanel><TextBlock Text="📶 NB-IoT" FontSize="22" FontWeight="Bold"/><TextBlock Text="Web export konverzija i kontrole" Margin="0,8,0,0"/></StackPanel>
+                <StackPanel>
+                    <TextBlock Text="📶 NB-IoT" FontSize="24" FontWeight="Bold" />
+                    <TextBlock Text="Web export, datum i UserCode kontrole" Foreground="#607D8B" Margin="0,4,0,12" />
+                    <Border Style="{StaticResource StatusPill}" DataContext="{Binding NbIotSummary}">
+                        <TextBlock Text="{Binding Status}" FontWeight="Bold" />
+                    </Border>
+                    <TextBlock Text="{Binding NbIotSummary.LastRun}" Margin="0,14,0,0" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding NbIotSummary.MainStat}" Margin="0,8,0,0" />
+                    <TextBlock Text="{Binding NbIotSummary.SecondaryStat}" />
+                    <TextBlock Text="{Binding NbIotSummary.WarningStat}" Foreground="#F57C00" FontWeight="SemiBold" />
+                    <Button Content="OPEN" Command="{Binding OpenNbIotCommand}" Width="100" HorizontalAlignment="Left" Margin="0,18,0,0" />
+                </StackPanel>
             </Border>
-            <Border Style="{StaticResource Card}">
+
+            <Border Style="{StaticResource ClickableCard}">
                 <Border.InputBindings>
                     <MouseBinding MouseAction="LeftClick" Command="{Binding OpenZgradeCommand}" />
                 </Border.InputBindings>
-                <StackPanel><TextBlock Text="🏢 Zgrade" FontSize="22" FontWeight="Bold"/><TextBlock Text="Spajanje očitanja zgrada i provjere" Margin="0,8,0,0"/></StackPanel>
+                <StackPanel>
+                    <TextBlock Text="🏢 Zgrade" FontSize="24" FontWeight="Bold" />
+                    <TextBlock Text="TXT spajanje, duplikati i lower reading" Foreground="#607D8B" Margin="0,4,0,12" />
+                    <Border Style="{StaticResource StatusPill}" DataContext="{Binding ZgradeSummary}">
+                        <TextBlock Text="{Binding Status}" FontWeight="Bold" />
+                    </Border>
+                    <TextBlock Text="{Binding ZgradeSummary.LastRun}" Margin="0,14,0,0" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding ZgradeSummary.MainStat}" Margin="0,8,0,0" />
+                    <TextBlock Text="{Binding ZgradeSummary.SecondaryStat}" />
+                    <TextBlock Text="{Binding ZgradeSummary.WarningStat}" Foreground="#F57C00" FontWeight="SemiBold" />
+                    <Button Content="OPEN" Command="{Binding OpenZgradeCommand}" Width="100" HorizontalAlignment="Left" Margin="0,18,0,0" />
+                </StackPanel>
             </Border>
         </UniformGrid>
-        <Border Style="{StaticResource Card}" Cursor="Arrow">
-            <StackPanel>
-                <TextBlock Text="Shared Source (ZaRtf.txt)" FontSize="18" FontWeight="Bold" />
-                <TextBlock Text="{Binding SourceText}" Margin="0,8,0,0" TextWrapping="Wrap" />
-                <Button Content="Otvori Postavke" Command="{Binding OpenSettingsCommand}" Width="140" HorizontalAlignment="Left" Margin="0,12,0,0" />
-            </StackPanel>
-        </Border>
-    </StackPanel>
+    </Grid>
 </UserControl>

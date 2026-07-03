@@ -43,7 +43,7 @@ public static class ZgradeService
             if (parts.Length < 2) continue;
             var user = parts[0];
             var meter = parts[1];
-            var readingText = ExtractReading(parts);
+            var readingText = parts.Length >= 5 ? parts[4] : (parts.Length >= 4 ? parts[3] : "0");
             var newReading = SourceRepository.ParseDecimal(readingText);
             parsed.Add((normalizedRaw, user, meter, newReading, readingText));
             var pairKey = user + "|" + meter;
@@ -55,22 +55,22 @@ public static class ZgradeService
         foreach (var rec in parsed)
         {
             if (fullLineCount[rec.Raw] > 1)
-                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="Duplicate line"});
+                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="Duplicate line", StatusLevel="Error"});
             if (pairCount[rec.User + "|" + rec.Meter] > 1)
-                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="Duplicate UserCode+Meter"});
+                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="Duplicate UserCode+Meter", StatusLevel="Error"});
             if (userMeters.TryGetValue(rec.User, out var meters) && meters.Count > 1)
-                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="User Code has multiple meters"});
+                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="User Code has multiple meters", StatusLevel="Warning"});
 
             if (!byUser.TryGetValue(rec.User, out var src))
             {
-                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="User Code not found"});
+                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, NewReading=rec.NewReadingText, Status="User Code not found", StatusLevel="Error"});
                 continue;
             }
             if (!string.Equals(src.Meter, rec.Meter, StringComparison.OrdinalIgnoreCase))
-                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, SourceReading=src.SourceValue, NewReading=rec.NewReadingText, Status=$"Meter mismatch, source meter: {src.Meter}"});
+                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, SourceReading=src.SourceValue, NewReading=rec.NewReadingText, Status=$"Meter mismatch, source meter: {src.Meter}", StatusLevel="Error"});
             var sourceReading = SourceRepository.ParseDecimal(src.SourceValue);
             if (rec.NewReading < sourceReading)
-                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, SourceReading=src.SourceValue, NewReading=rec.NewReadingText, Difference=(rec.NewReading-sourceReading).ToString(), Status="Lower reading"});
+                issues.Add(new ZgradeIssue{UserCode=rec.User, Meter=rec.Meter, SourceReading=src.SourceValue, NewReading=rec.NewReadingText, Difference=(rec.NewReading-sourceReading).ToString(), Status="Lower reading", StatusLevel="Error"});
         }
 
         var mergedPath = Path.Combine(outFolder, "zgrade_merged.txt");
@@ -91,13 +91,4 @@ public static class ZgradeService
         });
         return new ZgradeResult{Total=parsed.Count, Issues=issues.Count, Lower=issues.Count(i=>i.Status=="Lower reading"), Duplicates=issues.Count(i=>i.Status.Contains("Duplicate")||i.Status.Contains("multiple")), Folder=outFolder, MergedPath=mergedPath, MismatchPath=mismatchPath, LowerPath=lowerPath, DuplicatesPath=dupPath, LogPath=logPath, IssueList=issues};
     }
-    private static string ExtractReading(string[] parts)
-    {
-        // Zgrade lines are whitespace/fixed-width exports. Example:
-        // 0501267      25196123                          29.06.202621:18:40    11              2
-        // parts[0] = User Code, parts[1] = Meter, parts[2] = date/time, parts[3] = reading,
-        // parts[4] and later are status/control columns and must not be used as the reading.
-        return parts.Length >= 4 ? parts[3] : "0";
-    }
-
 }

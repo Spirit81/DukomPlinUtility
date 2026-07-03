@@ -8,4 +8,5 @@ public sealed class ZgradeIssue
     public string NewReading { get; set; } = string.Empty;
     public string Difference { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string StatusLevel { get; set; } = "Error";
 }

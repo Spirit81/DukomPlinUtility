@@ -14,14 +14,17 @@ public sealed class ZgradeViewModel : ViewModelBase
     private readonly Func<string> _getSharedSource;
     private readonly Func<string> _getDefaultOutputFolder;
     private readonly LogsViewModel _logs;
+    private readonly DashboardViewModel _dashboard;
+    private readonly Action<string, string, double, bool> _setStatus;
     private string _statsText = string.Empty;
-    private string _lastOutputFolder = string.Empty;
 
-    public ZgradeViewModel(Func<string> getSharedSource, Func<string> getDefaultOutputFolder, LogsViewModel logs)
+    public ZgradeViewModel(Func<string> getSharedSource, Func<string> getDefaultOutputFolder, LogsViewModel logs, DashboardViewModel dashboard, Action<string, string, double, bool> setStatus)
     {
         _getSharedSource = getSharedSource;
         _getDefaultOutputFolder = getDefaultOutputFolder;
         _logs = logs;
+        _dashboard = dashboard;
+        _setStatus = setStatus;
         BrowseFilesCommand = new RelayCommand(BrowseFiles);
         ClearCommand = new RelayCommand(() => Files.Clear());
         RunCommand = new RelayCommand(Run);
@@ -68,6 +71,7 @@ public sealed class ZgradeViewModel : ViewModelBase
                 return;
             }
 
+            _setStatus("Zgrade obrada u tijeku", $"TXT fajlova: {Files.Count}", 15, true);
             var result = ZgradeService.Process(Files, source, output);
             Issues.Clear();
             foreach (var issue in result.IssueList)
@@ -75,12 +79,14 @@ public sealed class ZgradeViewModel : ViewModelBase
                 Issues.Add(issue);
             }
 
-            _lastOutputFolder = result.Folder;
             StatsText = $"Rows: {result.Total}   Issues: {result.Issues}   Lower: {result.Lower}   Duplicates: {result.Duplicates}";
             _logs.LogText = LogViewerService.ReadSafe(result.LogPath);
+            _dashboard.UpdateZgrade(result.Total, result.Issues, result.Lower, result.Duplicates);
+            _setStatus("Zgrade završeno", $"Issues: {result.Issues}, Duplicates: {result.Duplicates}", 100, false);
         }
         catch (Exception ex)
         {
+            _setStatus("Zgrade greška", ex.Message, 0, false);
             MessageBox.Show(ex.Message, "Zgrade error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -94,7 +100,7 @@ public sealed class ZgradeViewModel : ViewModelBase
 
     private void OpenOutputFolder()
     {
-        var directory = !string.IsNullOrWhiteSpace(_lastOutputFolder) ? _lastOutputFolder : ResolveOutputFolder();
+        var directory = ResolveOutputFolder();
         if (Directory.Exists(directory))
         {
             Process.Start(new ProcessStartInfo { FileName = directory, UseShellExecute = true });

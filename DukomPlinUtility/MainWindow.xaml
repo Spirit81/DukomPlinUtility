@@ -72,17 +72,26 @@
         <Grid Grid.Column="1" Margin="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="38"/>
             </Grid.RowDefinitions>
 
-            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-                <ContentControl Content="{Binding CurrentViewModel}" />
-            </ScrollViewer>
+            <ContentControl Grid.Row="0" Content="{Binding CurrentViewModel}" />
 
-            <Grid Grid.Row="1">
-                <TextBlock Text="© DUKOM PLIN" Foreground="#F57C00" HorizontalAlignment="Right"/>
-                <TextBlock Text="Verzija 1.1.0" HorizontalAlignment="Center"/>
-            </Grid>
+            <Border Grid.Row="1" Background="White" BorderBrush="#E3E7EC" BorderThickness="1" CornerRadius="6" Padding="8,4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="260" />
+                        <ColumnDefinition Width="130" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="{Binding StatusText}" Foreground="#F57C00" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding StatusDetails}" Foreground="#607D8B" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <ProgressBar Grid.Column="2" Minimum="0" Maximum="100" Value="{Binding ProgressValue}" Height="14" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="v1.3.0" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#607D8B" />
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>
