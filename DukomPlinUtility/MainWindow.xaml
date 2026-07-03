@@ -1,0 +1,132 @@
+<Window x:Class="DukomPlinUtility.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DUKOM PLIN Utility Professional" Height="950" Width="1800"
+        MinHeight="850" MinWidth="1400" WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgBrush}">
+    <Window.Resources>
+        <Style x:Key="NavButton" TargetType="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Padding" Value="18,12" />
+            <Setter Property="Margin" Value="8,4" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="FontSize" Value="15" />
+        </Style>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#DDE2E8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Margin" Value="10" />
+        </Style>
+        <Style x:Key="OrangeButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#F57C00" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderBrush" Value="#F57C00" />
+        </Style>
+        <Style x:Key="GreenButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#22A735" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderBrush" Value="#22A735" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#E3E7EC" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="18">
+                    <Image Source="Assets/logo.png" Height="160" Stretch="Uniform" Margin="0,10,0,12"/>
+                    <TextBlock Text="DUKOM PLIN" FontSize="30" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" />
+                    <TextBlock Text="UTILITY" FontSize="24" FontWeight="Bold" Foreground="#F57C00" HorizontalAlignment="Center" />
+                    <TextBlock Text="Professional" FontSize="17" Foreground="#F57C00" HorizontalAlignment="Center" Margin="0,3,0,22"/>
+                    <Button x:Name="BtnDashboard" Style="{StaticResource NavButton}" Content="🏠  Dashboard" Click="Nav_Click" Tag="Dashboard" />
+                    <Button x:Name="BtnWalkBy" Style="{StaticResource NavButton}" Content="📡  WalkBy" Click="Nav_Click" Tag="WalkBy" />
+                    <Button x:Name="BtnNbIot" Style="{StaticResource NavButton}" Content="📶  NB-IoT" Click="Nav_Click" Tag="NbIot" />
+                    <Button x:Name="BtnZgrade" Style="{StaticResource NavButton}" Content="🏢  Zgrade" Click="Nav_Click" Tag="Zgrade" />
+                    <Button x:Name="BtnLogs" Style="{StaticResource NavButton}" Content="📄  Logovi" Click="Nav_Click" Tag="Logs" />
+                    <Button x:Name="BtnSettings" Style="{StaticResource NavButton}" Content="⚙️  Postavke" Click="Nav_Click" Tag="Settings" />
+                    <Button x:Name="BtnAbout" Style="{StaticResource NavButton}" Content="ℹ️  O programu" Click="Nav_Click" Tag="About" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom" Margin="18">
+                    <TextBlock Text="Tema" Foreground="#555" />
+                    <ComboBox SelectedIndex="0" Margin="0,5,0,10">
+                        <ComboBoxItem Content="Svijetla" />
+                    </ComboBox>
+                    <TextBlock Text="● Spreman" Foreground="#22A735" FontWeight="SemiBold" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+        <Grid Grid.Column="1" Margin="16">
+            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <StackPanel x:Name="ViewDashboard">
+                        <TextBlock Text="Dashboard" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
+                        <UniformGrid Columns="3">
+                            <Border Style="{StaticResource Card}" MouseLeftButtonUp="OpenWalkByCard"><StackPanel><TextBlock Text="📡 WalkBy" FontSize="22" FontWeight="Bold"/><TextBlock Text="Holosys WalkBy XML + ZaRtf.txt" Margin="0,8,0,0"/></StackPanel></Border>
+                            <Border Style="{StaticResource Card}" MouseLeftButtonUp="OpenNbIotCard"><StackPanel><TextBlock Text="📶 NB-IoT" FontSize="22" FontWeight="Bold"/><TextBlock Text="Web export konverzija i kontrole" Margin="0,8,0,0"/></StackPanel></Border>
+                            <Border Style="{StaticResource Card}" MouseLeftButtonUp="OpenZgradeCard"><StackPanel><TextBlock Text="🏢 Zgrade" FontSize="22" FontWeight="Bold"/><TextBlock Text="Spajanje očitanja zgrada i provjere" Margin="0,8,0,0"/></StackPanel></Border>
+                        </UniformGrid>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Shared Source (ZaRtf.txt)" FontSize="18" FontWeight="Bold" />
+                                <TextBlock x:Name="LblDashboardSource" Margin="0,8,0,0" Text="Source nije postavljen" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="ViewWalkBy" Visibility="Collapsed">
+                        <TextBlock Text="Holosys WalkBy" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
+                        <Border Style="{StaticResource Card}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0"><TextBlock Text="1. Odaberi XML obilazak" FontWeight="Bold"/><Border BorderBrush="#CDD3DA" BorderThickness="1" CornerRadius="6" Height="115" Margin="0,10" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Xml_Drop"><TextBlock Text="XML\nPovuci ovdje ili klikni Browse" TextAlignment="Center" VerticalAlignment="Center" Foreground="#F57C00"/></Border><DockPanel><Button Content="📁" DockPanel.Dock="Right" Click="BrowseXml_Click"/><TextBox x:Name="TxtXml" ToolTip="Odaberi XML dobiven iz Holosys WalkBy sustava."/></DockPanel></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="15,0"><TextBlock Text="2. Source iz Postavki" FontWeight="Bold"/><Border BorderBrush="#CDD3DA" BorderThickness="1" CornerRadius="6" Height="115" Margin="0,10"><TextBlock x:Name="TxtWalkBySourceView" Text="ZaRtf.txt nije postavljen" TextAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"/></Border><Button Content="Otvori Postavke" Click="OpenSettings_Click"/></StackPanel>
+                                <StackPanel Grid.Column="2"><TextBlock Text="3. Odaberi izlaznu mapu" FontWeight="Bold"/><Border BorderBrush="#CDD3DA" BorderThickness="1" CornerRadius="6" Height="115" Margin="0,10" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Output_Drop"><TextBlock Text="Mapa\nPovuci ovdje ili klikni Browse" TextAlignment="Center" VerticalAlignment="Center" Foreground="#F57C00"/></Border><DockPanel><Button Content="📁" DockPanel.Dock="Right" Click="BrowseOutput_Click"/><TextBox x:Name="TxtOutput"/></DockPanel></StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource Card}"><StackPanel Orientation="Horizontal"><Button Style="{StaticResource OrangeButton}" Content="▶ POKRENI WALKBY" Width="220" Click="RunWalkBy_Click"/><Button Content="Otvori izlaznu mapu" Click="OpenOutput_Click"/><TextBlock x:Name="LblWalkByStats" Margin="20,8" FontWeight="Bold"/></StackPanel></Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="ViewNbIot" Visibility="Collapsed">
+                        <TextBlock Text="NB-IoT Export" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
+                        <Border Style="{StaticResource Card}">
+                            <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="300"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0"><TextBlock Text="1. Odaberi XLS/XLSX/TXT export" FontWeight="Bold"/><Border BorderBrush="#CDD3DA" BorderThickness="1" CornerRadius="6" Height="115" Margin="0,10" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="NbIot_Drop"><TextBlock Text="Povuci NB-IoT export ovdje" TextAlignment="Center" VerticalAlignment="Center" Foreground="#22A735"/></Border><DockPanel><Button Content="📁" DockPanel.Dock="Right" Click="BrowseNbIot_Click"/><TextBox x:Name="TxtNbIot"/></DockPanel></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="15,0"><TextBlock Text="2. Očekivani datum očitanja" FontWeight="Bold"/><DatePicker x:Name="DpExpectedDate" Margin="0,10"/><CheckBox x:Name="ChkCroatian" Content="Zamijeni hrvatske znakove" IsChecked="True" Margin="0,20"/></StackPanel>
+                                <StackPanel Grid.Column="2"><TextBlock Text="3. Izlazna mapa" FontWeight="Bold"/><Border BorderBrush="#CDD3DA" BorderThickness="1" CornerRadius="6" Height="115" Margin="0,10" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Output_Drop"><TextBlock Text="Povuci mapu ovdje" TextAlignment="Center" VerticalAlignment="Center" Foreground="#F57C00"/></Border><TextBox x:Name="TxtNbOutput"/></StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource Card}"><StackPanel Orientation="Horizontal"><Button Style="{StaticResource GreenButton}" Content="☁ IZVEZI NB-IoT" Width="200" Click="RunNbIot_Click"/><Button Content="Otvori izlaz" Click="OpenOutput_Click"/><TextBlock x:Name="LblNbStats" Margin="20,8" FontWeight="Bold"/></StackPanel></Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="ViewZgrade" Visibility="Collapsed">
+                        <TextBlock Text="Zgrade" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10" />
+                        <Border Style="{StaticResource Card}" AllowDrop="True" PreviewDragOver="File_DragOver" Drop="Zgrade_Drop">
+                            <StackPanel>
+                                <TextBlock FontWeight="Bold">Dodaj TXT fajlove zgrada (drag and drop ili Browse). Drag and drop ovdje ne mijenja Shared Source.</TextBlock>
+                                <StackPanel Orientation="Horizontal" Margin="0,10"><Button Content="Dodaj TXT fajlove" Click="BrowseZgrade_Click"/><Button Content="Clear" Click="ClearZgrade_Click"/><Button Style="{StaticResource OrangeButton}" Content="Pokreni provjeru" Click="RunZgrade_Click"/><TextBlock x:Name="LblZgradeStats" Margin="20,8" FontWeight="Bold"/></StackPanel>
+                                <ListBox x:Name="ListZgradeFiles" Height="90"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <DockPanel><TextBlock DockPanel.Dock="Top" Text="Pregled grešaka / upozorenja" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/><DataGrid x:Name="GridZgradeIssues" AutoGenerateColumns="True" Height="360" IsReadOnly="True"/></DockPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="ViewLogs" Visibility="Collapsed"><TextBlock Text="Logovi" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10"/><Border Style="{StaticResource Card}"><StackPanel><Button Content="Učitaj log" Click="OpenLog_Click" Width="120" HorizontalAlignment="Left"/><TextBox x:Name="TxtLogViewer" FontFamily="Consolas" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="620"/></StackPanel></Border></StackPanel>
+                    <StackPanel x:Name="ViewSettings" Visibility="Collapsed"><TextBlock Text="Postavke" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10"/><Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Shared Source (ZaRtf.txt iz KODING-a - STA + PRI)" FontWeight="Bold"/><DockPanel Margin="0,8"><Button Content="Browse" DockPanel.Dock="Right" Click="BrowseSource_Click"/><TextBox x:Name="TxtSharedSource" ToolTip="Ovdje učitati ZaRtf.txt očitačku listu iz KODING-a - STA + PRI."/></DockPanel><TextBlock Text="Koristi se za WalkBy, NB-IoT i Zgrade module." Foreground="#555"/><Button Content="Spremi postavke" Width="150" Margin="0,18,0,0" HorizontalAlignment="Left" Click="SaveSettings_Click"/></StackPanel></Border></StackPanel>
+                    <StackPanel x:Name="ViewAbout" Visibility="Collapsed"><TextBlock Text="O programu" FontSize="24" FontWeight="Bold" Foreground="#F57C00" Margin="10"/><Border Style="{StaticResource Card}"><TextBlock Text="DUKOM PLIN Utility Professional&#10;Verzija 1.0.0&#10;&#10;Moduli: WalkBy, NB-IoT, Zgrade, Logovi, Postavke." FontSize="16"/></Border></StackPanel>
+                </Grid>
+            </ScrollViewer>
+            <Grid Grid.Row="1"><TextBlock Text="© DUKOM PLIN" Foreground="#F57C00" HorizontalAlignment="Right"/><TextBlock Text="Verzija 1.0.0" HorizontalAlignment="Center"/></Grid>
+        </Grid>
+    </Grid>
+</Window>
