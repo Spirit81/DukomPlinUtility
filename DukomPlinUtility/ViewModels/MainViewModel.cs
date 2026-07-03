@@ -12,6 +12,10 @@ public sealed class MainViewModel : ViewModelBase
     private readonly AppSettings _settings;
     private ViewModelBase _currentViewModel;
     private AppModule _currentModule;
+    private string _statusText = "Spreman";
+    private string _statusDetails = "DUKOM PLIN Utility Professional";
+    private double _progressValue;
+    private bool _isBusy;
 
     public MainViewModel(Window window)
     {
@@ -22,9 +26,9 @@ public sealed class MainViewModel : ViewModelBase
         Logs = new LogsViewModel();
         Dashboard = new DashboardViewModel(NavigateTo);
         Settings = new SettingsViewModel(SaveSettingsWithMessage, UpdateSharedSourceViews);
-        WalkBy = new WalkByViewModel(() => Settings.SharedSourceFile, Logs, NavigateTo);
-        NbIot = new NbIotViewModel(Logs);
-        Zgrade = new ZgradeViewModel(() => Settings.SharedSourceFile, () => FirstNonEmpty(WalkBy.OutputFolder, NbIot.OutputFolder, _settings.LastOutputFolder), Logs);
+        WalkBy = new WalkByViewModel(() => Settings.SharedSourceFile, Logs, Dashboard, SetOperationStatus, NavigateTo);
+        NbIot = new NbIotViewModel(Logs, Dashboard, SetOperationStatus);
+        Zgrade = new ZgradeViewModel(() => Settings.SharedSourceFile, () => FirstNonEmpty(WalkBy.OutputFolder, NbIot.OutputFolder, _settings.LastOutputFolder), Logs, Dashboard, SetOperationStatus);
         About = new AboutViewModel();
 
         NavigateCommand = new RelayCommand(parameter => NavigateTo(AppModuleExtensions.FromString(parameter?.ToString())));
@@ -58,6 +62,30 @@ public sealed class MainViewModel : ViewModelBase
         private set => SetProperty(ref _currentModule, value);
     }
 
+    public string StatusText
+    {
+        get => _statusText;
+        set => SetProperty(ref _statusText, value);
+    }
+
+    public string StatusDetails
+    {
+        get => _statusDetails;
+        set => SetProperty(ref _statusDetails, value);
+    }
+
+    public double ProgressValue
+    {
+        get => _progressValue;
+        set => SetProperty(ref _progressValue, value);
+    }
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => SetProperty(ref _isBusy, value);
+    }
+
     private void LoadSettingsToViewModels()
     {
         Settings.SharedSourceFile = _settings.SharedSourceFile;
@@ -81,6 +109,8 @@ public sealed class MainViewModel : ViewModelBase
         };
 
         _settings.LastModule = module.ToString();
+        StatusText = module == AppModule.Dashboard ? "Spreman" : $"Otvoren modul: {module}";
+        StatusDetails = Dashboard.SourceStatus;
         UpdateSharedSourceViews();
     }
 
@@ -92,12 +122,14 @@ public sealed class MainViewModel : ViewModelBase
 
         Dashboard.SourceText = source;
         WalkBy.SourceText = source;
+        StatusDetails = Dashboard.SourceStatus;
     }
 
     private void SaveSettingsWithMessage()
     {
         SaveSettings();
         UpdateSharedSourceViews();
+        SetOperationStatus("Postavke spremljene", "Shared Source i postavke su spremljene.", 100, false);
     }
 
     public void SaveSettings()
@@ -113,6 +145,14 @@ public sealed class MainViewModel : ViewModelBase
         {
             // Settings must never crash the application.
         }
+    }
+
+    private void SetOperationStatus(string text, string details, double progress, bool isBusy)
+    {
+        StatusText = text;
+        StatusDetails = details;
+        ProgressValue = Math.Max(0, Math.Min(100, progress));
+        IsBusy = isBusy;
     }
 
     private static string FirstNonEmpty(params string[] values)

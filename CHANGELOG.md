@@ -46,14 +46,21 @@
 - Existing output formats and validation rules.
 - Existing light UI design.
 
-## v1.1.1 - Module Functionality Stabilization
+## v1.2.1 - Scroll fix
 
-### Fixed
-- Restored module functionality after MVVM migration checks.
-- Zgrade parser now reads the actual building reading from the first value after date/time (`parts[3]`) instead of the trailing status/control column.
-- Zgrade **Open output** now opens the generated `Zgrade_obrade` subfolder after processing.
+Fixed
+- Removed outer ScrollViewer around module host so DataGrid receives mouse wheel events.
+- Updated WalkBy and NB-IoT views to use Grid rows with star-sized result preview table.
+- Enabled native DataGrid vertical/horizontal scrolling and virtualization.
 
-### Kept
-- Existing WalkBy, NB-IoT and Zgrade output formats.
-- Shared Source behavior from Settings.
-- Light UI and module navigation.
+## v1.3.0 - Operations Center
+
+Added
+- Dashboard Operations Center cards for WalkBy, NB-IoT and Zgrade.
+- Live summary after each successful module run.
+- Shared Source status with last modified date.
+- Global status bar with operation status and progress.
+- Zgrade DataGrid row coloring using status severity.
+
+Changed
+- Version label updated to v1.3.0.
